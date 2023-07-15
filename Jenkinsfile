@@ -29,6 +29,13 @@ pipeline{
               bat 'mvn verify -DskipUnitTests'
             }
         }
+        stage('Maven Bulid')
+        {
+            steps
+            {
+              bat 'mvn clean install'
+            }
+        }
         
     }
 }
