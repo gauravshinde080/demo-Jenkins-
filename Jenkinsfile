@@ -90,32 +90,6 @@ pipeline{
             }
         }
 
-     stage('Docker Image Build'){
-
-            steps{
-
-                script {
-                    sh 'docker image build -t $JOB_NAME:v1.$BUILD_ID .'
-                    sh 'docker image tag $JOB_NAME:v1.$BUILD_ID vikashashoke/$JOB_NAME:v1.$BUILD_ID'
-                    sh 'docker image tag $JOB_NAME:v1.$BUILD_ID vikashashoke/$JOB_NAME:latest'
-                }
-            }
-        }
-
-        stage('push image to the dockerHUb'){
-
-            steps{
-
-                script{
-
-                    withCredentials([string(credentialsId: 'dockerhub_pwd', variable: 'dockerhub_cred')]) {
-                        
-                        sh 'docker login -u vikashashoke -p ${dockerhub_cred}'
-                        sh 'docker image push vikashashoke/$JOB_NAME:v1.$BUILD_ID'
-                        sh 'docker image push vikashashoke/$JOB_NAME:latest'
-                    }
-                }
-            }
-        }
+    
     }
 }
