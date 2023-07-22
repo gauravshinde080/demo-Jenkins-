@@ -105,5 +105,21 @@ stage('Docker Image Build'){
                 }
             }
         }
+
+           stage('push image to the dockerHUb'){
+
+            steps{
+
+                script{
+
+                    withCredentials([string(credentialsId: 'dockerhub_pwd', variable: 'dockerhub_cred')]) {
+                        
+                        bat 'docker login -u omkar008 -p ${dockerhub_cred}'
+                        bat 'docker image push omkar008/demoapp'
+                        bat 'docker image push omkar008/demoapp:latest'
+                    }
+                }
+            }
+        }
     }
 }
