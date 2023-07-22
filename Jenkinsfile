@@ -99,9 +99,9 @@ stage('Docker Image Build'){
             steps{
 
                 script {
-                    bat 'docker image build -t $JOB_NAME:v1.$BUILD_ID .'
-                    bat 'docker image tag $JOB_NAME:v1.$BUILD_ID omkar008/$JOB_NAME:v1.$BUILD_ID'
-                    bat 'docker image tag $JOB_NAME:v1.$BUILD_ID omkar008/$JOB_NAME:latest'
+                    bat 'docker image build -t $JOB_NAME:v1.$BUILD_NUMBER .'
+                    bat 'docker image tag $JOB_NAME:v1.$BUILD_NUMBER omkar008/$JOB_NAME:v1.$BUILD_NUMBER'
+                    bat 'docker image tag $JOB_NAME:v1.$BUILD_NUMBER omkar008/$JOB_NAME:latest'
                 }
             }
         }
