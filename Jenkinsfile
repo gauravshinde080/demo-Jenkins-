@@ -111,13 +111,11 @@ stage('Docker Image Build'){
             steps{
 
                 script{
-
-                    withCredentials([string(credentialsId: 'dockerhub_pwd', variable: 'dockerhub_cred')]) {
                         
-                        bat 'docker login -u omkar008 -p ${dockerhub_cred}'
+                        bat 'docker login -u omkar008 -p dckr_pat_IEi85vDRa0w8AHT2YgogVQDe9_M'
                         bat 'docker image push omkar008/demoapp'
                         bat 'docker image push omkar008/demoapp:latest'
-                    }
+                    
                 }
             }
         }
