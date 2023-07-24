@@ -8,7 +8,7 @@ public class SpringbootApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringbootApplication.class, args);
-                 System.out.println("This is spring-boot project);
+                 System.out.println("This is spring-boot project");
 	}
 
 }
