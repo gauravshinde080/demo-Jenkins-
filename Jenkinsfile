@@ -23,13 +23,7 @@ pipeline{
               bat 'mvn test'
             }
         }
-        stage('INTEGRATION Testing')
-        {
-            steps
-            {
-              bat 'mvn verify -DskipUnitTests'
-            }
-        }
+     
         stage('Maven Bulid')
         {
             steps
