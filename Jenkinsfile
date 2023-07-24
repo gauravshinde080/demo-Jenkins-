@@ -39,7 +39,7 @@ pipeline{
                     
                     withSonarQubeEnv(credentialsId: 'sonar1') {
                         
-                        bat 'mvn clean package sonar:sonar'
+                        bat 'mvn sonar:sonar'
                     }
                    }
                     
