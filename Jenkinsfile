@@ -24,7 +24,7 @@ pipeline{
             }
         }
      
-        stage('Maven Bulid')
+        stage('Maven Build')
         {
             steps
             {
@@ -57,7 +57,7 @@ pipeline{
                 }
             }
 
-         stage('upload war file to nexus'){
+         stage('Upload artifact to Nexus'){
 
             steps{
 
@@ -99,7 +99,7 @@ stage('Docker Image Build'){
             }
         }
 
-           stage('push image to the dockerHUb'){
+           stage('Push Image to DockerHub'){
 
             steps{
 
