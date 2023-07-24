@@ -93,8 +93,8 @@ stage('Docker Image Build'){
             steps{
 
                 script {
-                    bat 'docker image build -t demoapp .'
-                    bat 'docker image tag demoapp omkar008/demoapp'
+                    bat 'docker build -t demoapp .'
+                    bat 'docker tag demoapp omkar008/demoapp'
                 }
             }
         }
@@ -106,7 +106,7 @@ stage('Docker Image Build'){
                 script{
                         
                         bat 'docker login -u omkar008 -p dckr_pat_IEi85vDRa0w8AHT2YgogVQDe9_M'
-                        bat 'docker image push omkar008/demoapp'
+                        bat 'docker push omkar008/demoapp'
                     
                 }
             }
