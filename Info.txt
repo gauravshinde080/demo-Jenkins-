@@ -1,0 +1,144 @@
+1.Install java, set path=....jdk17/bin and JAVA_HOME=.../jdk17(jenkins will use JAVA_HOME to locate java while installing)
+2. Install Jenkins and do setup
+3.  Install Sonarqube
+4.   Install Nexus
+5. fork repo to your git=https://github.com/vikash-kumar01/demo-counter-app.git
+6. In Jenkins Dashbaord-> Manage Jenkins-> Tools->add jdk -> add JAVA_HOME path 
+                                                  add maven-> install automatically
+7. In Jenkins
+            -create a pipeline "DemoApplication"
+            -In pipeline, in configuration choose "pipeline script from scm", give repo url and branch name
+            -In pipeline, pipeline syntax has template for pipeline script for various stages
+            - add tools in jenkinsfile(create syntax for that from Declartative Directive Generator in pipeline syntax) 
+            
+8. In Jenkins,
+           -Add plugin "sonarqube scanner' and 'sonar quality gates' 
+           -On sonarqube server -> administration -> Users -> Generate token
+           -In jenkins> manage jenkins > credentials > system > Global credentials(unrestricted)> Add credentials with kind "secret text" > paste copied token > enter id for secret(sonar1).
+           - In jenkins> manage jenkins > system > Add SonarQube Servers > enter sonar server url > add name(not id) of secret(soanr1) in Server authentication token.(but id of secret will be credentialsId in pipeline script)
+          
+            
+9.In SonarQube,
+          -To complete 'quality gate ' stage/task in we need to make connection of jenkins and sonarqube.
+          - Before following next step, if jenkins is installed in localhost, then on sonarqube Administration › General Settings > Security, setting "Enable local webhooks validation” to false.
+          -On sonarqube server -> administration -> configuration > webhooks > create webhook > give any name> give jenkins server url as '<your Jenkins instance>/sonarqube-webhook/' > no need to create a secret
+
+
+10.nexus task
+-In nexus, settings> repo > choose maven(hosted)> give name > choose relase/snapshot/mixed >      create 2 repo: demoapp-Release, demoapp-Snapshot
+
+-install plugin in jenkins named "nexus artifact uploader" and "pipeline utility steps"
+-go to pipeline syntax in jenkins, choose nexus artifact uploader as sample step
+      choose nexus version, nexus url, credentials>add credentials>choose kind username with password>give username and password of nexus>give id for that credential(nexus-auth), enter group id from pom.xml, we are using version dynamically so no need to add it, repo also adding dynamically, add artifactId from pom.xml , type as jar, file as target/Uber.jar
+-generate pipeline syntax	  
+
+
+docker image build task
+install docker on VM, add jenkins user to docker group by doing "usermod -a -G docker jenkins" , sytemctl restart jenkins, systemctl start docker
+- install docker plugin in jenkins(may be we havce refer it through tools) docker pipeline, dockerbuild step, cloudbees docker
+
+
+
+docker hub pushing image task
+-go to pipeline syntax in jenkins, choose 'withCredetials:BindCredentials to variables'
+-bindings> add secret text > variable: docker_hub_cred >add credentials>choose kind as secret text >put password of dockerhub as secret>
+give id:dockerhub_pwd>generate pipeline syntax	
+
+
+
+note: after adding plugin check system/tools/pipeline syntax samples
+
+
+
+-----jenkins------
+port-8080
+username-jenkins
+password-jenkins
+
+
+
+----sonarqube------
+port-9000
+username-admin
+password-sonar
+go to sonar\bin\windows-x86-64 -> run StartSonar as administrator
+sonar_token   squ_4a2ca44ad5d46abe0bd0f39d6ada8bced7adbcae
+
+----nexus------------
+port-8081
+username-admin
+password-nexus
+cd C:\nexus-3.57.0-01-win64\nexus-3.57.0-01\bin 
+.\nexus.exe /run
+
+--docker
+jenkins-token dckr_pat_IEi85vDRa0w8AHT2YgogVQDe9_M
+
+
+
+Presentation Deck-  
+
+Project repo -https://github.com/omkars8/demo-counter-app.git
+
+*  Jenkins is an open source tool to automate application and deployment. It is a Java based tool
+*  It allows us to automate build process which includes taking code from git repository, compiling source code, packaging source code, performing code review, storing build artifacts white deployment process includes deploying code By running application war file on server, running docker container through image, deploying application in kubernetes cluster.
+*  Jenkins allow us to create pipeline. The pipeline is set of jobs which are going to be executed one after another once the pipeline is triggered
+*  Jenkins have this feature called plugin system. This plugins increase the functionality of Jenkins to suit organization specific or user specific needs. Through plugins only we can integrate various tools with our pipeline.
+*  CI or continuous integration means new code changes are continuously built, tested and merged into shared repository.
+*  CD or continuous deployment that means automatically deploying application to different environments.
+
+
+Now we will see for Jenkinsfile for our pipeline. Jenkins is a text file that contains definition of Jenkins pipeline. there are two ways to write this file first one is scripted second one is declarative. declarative syntaxt is more structured and easier to read we have used declarative one in our pipeline.
+
+Let's understand the basic of Jenkins file
+*  pipeline is a block which includes all other blocks it is starting of declarative  pipeline .
+*  Agent specifies where a Jenkin pipeline task should be executed if we have Jenkins master with multiple slave nodes we can specify that where we want to run our tasks in this case we are using any agent that means any available node will be used for execution of tasks
+*  by default Jenkins comes with built-in agent call master master node which is Jenkins server itself.
+*  Tools specify any tools we are using to run task in pipeline
+*  stages can contain one or more stage block where each stage block will correspond to one task in pipeline
+*  steps are like what needs to be done to complete that stage it contains actual instruction that will be executed
+
+*  all the stages of pipeline we are going to see will work if the plugins are installed properly with their correct configurations and all required DevOps tools are installed
+*  Jenkins create folder for our pipeline in the workspaces directory where Jenkins is installed.
+*  We have to set up credentials for each tool we're going to integrate with our Jenkins.
+*  Credentials feature in Jenkins allow us to store required credentials securely by giving them labels or ID's this ID will be used in Jenkins file to access specific tools and to authenticate the user.
+*  First stage is git check out this stage will switch to specific branch in git repository through URL provided here it will retrieve source code for the pipeline from specified git repo
+*  Second stage maven test will run test cases for the project
+*  in next stage maven clean install command is there. Clean command will delete all previously compiled Java classes and install command will compile test and package our Java project and copy jar or war file on to maven repository on local machine.
+*  4th stage is static code analysis. Sonarqube scanner will analyze the code then we'll send the I need this report to sonarqube server after executing this stage we can see something like this in sonarqube server, here it shows any vulnerabilities potential bugs, code smells, duplicate code blocks, code standards violation, coding conventions violation, code coverage
+*  Next pages quality gate it represents set of metric project quality certain metrics are decided earlier in sonar Q if our code passed on those metrics it is eligible  for going into further stages of pipeline.
+
+
+*  In this stage we have used one attribute called abort pipeline if I set this attribute as true then in that case pipeline will get aborted and further stages will not be executed. in our case the code which I have used may not be following some coding standards so if quality gate is not passed then further stages won't execute so I have to make it false.
+*  Next stage is uploading this artifact to Nexus supposed to be plug in which I have installed earlier Nexus artifact uploader will upload my artifact in Nexus repository manager. I have created two repository one for release and another for snapshot. If  project is under development Then that project build artifact will be stored in snapshot repository. If project is released to production our development is completed for that artifact will be stored in release repository.
+*  Now which repository will be used for each pipeline run is decided dynamicall Except for that I have installed plugin called pipeline utility steps. It allows to include one function here which will read pom.xml And if version tag in pom.xml is ending with snapshot or release then artifact will be uploaded in that respective repository.
+*  Next stage is docker build. This stage will require some plugins and docker installed in our machine. It will refer docker file to build image. After execution we will get one docker image with name demoapp. I have the name that image from demo app to omkar008/demoapp with docker tag command. I have renamed this image because while uploading the image to docker hub we have to follow some conventions. According to that docker ID/repository name: tag name will be correct name before uploading image to docker hub
+*  for next stage we have to get access token from docker hub folder this access token will act as password for authenticating our Jenkins pipeline with docker hub. We will push our docker image built in previous stage to docker hub account. The repository for this image is public anyone can pull the docker image and run on the machine with docker installed.
+
+
+*  docker file we used in this project have two stages. In the first stage it uses may one image to build Java application. In second stage it uses open JDK 11 image to run the compiled Java application
+*  Docker file contains series of instructions. Each instruction translated into layer in docker image. To build an efficient docker image, we need to eliminate some of these layers from the final output. For this we need multi stage builds here in the first stage we compiled and packaged Java application while in second stage we took that packaged file and run it.
+*  So from command in second stage can copy artifacts from previous stage. Most importantly final image is produced from the last stage executed in docker file.
+
+
+Docker file explained -
+FROM maven as build -  from command specified base image for this stage. Build is the name of this first stage.
+WORKDIR /app - this line sets working directory inside docker container to / app.
+COPY . . - copy will copy source code of your application from host machine to current  working directory(/app). These two dots indicate copy content from current directory in which docker file is there(in Jenkins/workspaces/demoapplication) to current working directory in container. 
+RUN mvn install - run command instruction will execute while creating and image. Install command will compile, test, package Java project. Here maven will look for pom.xml in /app directory and use it to resolve dependencies and compile the code.
+
+
+FROM openjdk:11.0 - this line sets base image JDK 11 for this stage.
+WORKDIR /app - sets working directory to /app
+COPY --from=build /app/target/Uber.jar /app/ - this line copies jar file that was built in the first stage first stage i.e build stage 2 app directory in second stage. This way final image only includes the compiled and packaged application.
+EXPOSE 9090 –it exposes port 9090 on docker container that means container will listen on port 9090.
+CMD ["java","-jar","Uber.jar"]  - CMD command is used to execute commands while creating container. Here this specific command will run Java application by executing Jar file.
+
+Some more about docker:
+*  In application development there are multiple environments such as dev environment, SIT environment, UAT environment, production environment. 
+*  DevOps engineer will deploy the code in multiple environments. To deploy application in these many environments we need to take care of all configurations and dependencies this is where containerization technology will help us.
+*  A container is a way to run applications that are isolated from each other. Rather than virtualizing the hardware to run multiple operating system; container rely on virtualizing operating system to run multiple applications.
+*  Docker it's a containerization platform and container runtime that helps developers build, deploy and run containers.
+*  Docker follows the client server architecture in which we have docker demon which listens for docker API request and manages building, running docker containers.(docker engine=docker deamon)
+*  docker client is a way to interact with docker demon.
+*  Docker registry stores docker images. docker hub is a public registry that anyone can use. We can have our own private registry.
