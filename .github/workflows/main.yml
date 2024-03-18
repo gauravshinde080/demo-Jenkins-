@@ -21,7 +21,7 @@ jobs:
       - name: Set up Maven
         uses: actions/setup-java@v2
         with:
-          java-version: '3.8'
+          java-version: '3'
           
       - name: UNIT Testing
         run: mvn test       
