@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]  
+    branches: [main]
 
 jobs:
   build:
@@ -22,6 +22,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install maven -y
+
+
       - name: Unit Testing
         run: mvn test
 
@@ -39,8 +41,10 @@ jobs:
 
       - name: Quality Gate Status
         run: |
-          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.11:sonar
+          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar
+          mvn sonar:quality-gate -Dsonar.login="${{secrets.SONAR_TOKEN}}" -Dsonar.host.url="{{secrets.SONAR_HOST_URL}}"
         
+
       - name: Upload WAR file to Nexus
         run: |
           mvn deploy:deploy-file \
@@ -53,6 +57,7 @@ jobs:
             -Dpackaging=jar \
             -Dclassifier= \
             -DgeneratePom=false
+
       - name: Docker Image Build
         run: |
           docker build -t ${{ github.repository }}:v1.${{ github.run_number }} .
