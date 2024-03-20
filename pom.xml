@@ -10,11 +10,14 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>springboot</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>2.0.1-SNAPSHOT</version>
 	<name>springboot</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>
+		<sonar.host.url>http://3.108.196.211:9000</sonar.host.url>
+		<sonar.login>admin</sonar.login>
+		<sonar.password>@183729#</sonar.password>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -35,6 +38,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<executions>
+					
                 <execution>
                     <id>repackage</id>
                     <goals>
@@ -45,6 +49,24 @@
                     </configuration>
                 </execution>
             </executions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.9.1.2184</version>
+				<configuration>
+					<properties>
+						<property>
+						        <key>sonar.login</key>
+						        <value>${sonar.login}</value>
+						</property>
+						<property>
+							<key>sonar.password</key>
+							<value>${sonar.password}</value>
+						</property>
+					</properties>
+				
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
