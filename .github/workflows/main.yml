@@ -1,55 +1,23 @@
-name: Java CI/CD Pipeline
+name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v2
-
-      - name: Set up JDK 17
+      
+      - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: '17'
+          java-version: '11' # Specify your desired Java version here
+          distribution: 'adopt' # Use 'adopt' distribution for OpenJDK
 
-      - name: Set up Maven
-        uses: actions/setup-java@v2
-        with:
-          java-version: '3.x'
-          distribution: 'maven'
-
-      - name: Docker login
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u omkar008 --password-stdin
-
-      - name: Build and test with Maven
+      - name: Install Maven
         run: |
-          mvn test
-          mvn clean install
-
-      - name: Static code analysis with SonarQube
-        run: |
-          mvn sonar:sonar
-
-      - name: Quality Gate Status
-        run: waitForQualityGate abortPipeline=false, credentialsId='sonar1'
-
-      - name: Upload artifact to Nexus
-        run: |
-          readPomVersion=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          nexusRepo=$(echo $readPomVersion | grep -q "SNAPSHOT" && echo "demoapp-snapshot" || echo "demoapp-release")
-          mvn deploy:deploy-file -Durl=http://localhost:8081/repository/$nexusRepo -DrepositoryId=nexus-auth -Dfile=target/Uber.jar -DgroupId=com.example -DartifactId=springboot -Dversion=$readPomVersion -Dpackaging=jar
-
-      - name: Docker Image Build
-        run: |
-          docker build -t demoapp .
-          docker tag demoapp omkar008/demoapp
-
-      - name: Push Image to DockerHub
-        run: docker push omkar008/demoapp
-
+          sudo apt-get update
