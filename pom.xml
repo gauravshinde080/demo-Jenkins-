@@ -17,7 +17,7 @@
 		<java.version>11</java.version>
 		<sonar.host.url>http://3.108.196.211:9000</sonar.host.url>
 		<sonar.login>admin</sonar.login>
-		<sonar.password>@183729#</sonar.password>
+		<sonar.password>Akola@1234</sonar.password>
 	</properties>
 	<dependencies>
 		<dependency>
